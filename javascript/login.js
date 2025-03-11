@@ -1,36 +1,31 @@
 const form = document.querySelector(".login form"),
-continueBtn = form.querySelector(".button input"),
-errorText = form.querySelector(".error-txt");
+      continueBtn = form.querySelector(".button input"),
+      errorText = form.querySelector(".error-txt");
 
+form.addEventListener("submit", (e) => e.preventDefault());
 
-form.onsubmit = (e)=>{
-  e.preventDefault(); 
-}
+continueBtn.addEventListener("click", () => {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "./controller/LoginController.php", true); // Vérifie si le chemin est correct
+    xhr.onload = () => {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            let data = xhr.response.trim(); // Trim pour éviter les espaces blancs
+            console.log(data);
 
-continueBtn.onclick = ()=>{
-  //Ajax 
+            if (data === "success") {
+                // Une fois l'utilisateur authentifié, on récupère l'ID unique de la session PHP
+                let userId = <?php echo $_SESSION['unique_id']; ?>;  // Utiliser PHP pour insérer l'ID utilisateur dans le script
 
-  let xhr = new XMLHttpRequest();
-  xhr.open("POST", "../controller/LoginController.php", true);
-  xhr.onload = ()=>{
-      if(xhr.readyState === XMLHttpRequest.DONE)
-      {
-          if(xhr.status === 200)
-          {
-              let data = xhr.response;
-              console.log(data);
-                if(data == "success")
-               {
-                   location.href = "user.php";
-               }else{
-                   errorText.textContent = data;
-                   errorText.style.display = "block";
-              }
-          }
-      }
-  }
+                // Rediriger vers le chat avec l'ID utilisateur passé en paramètre
+                location.href = `./view/chat.php?user_id=${userId}`;
+            } else {
+                errorText.innerHTML = data;
+                errorText.style.display = "block";
+            }
+        }
+    };
 
-  // Envoie des informations d'Ajax à php
-  let formData = new FormData(form);
-  xhr.send(formData);
-}
+    // Ajoute les données du formulaire à FormData
+    let formData = new FormData(form);
+    xhr.send(formData);
+});

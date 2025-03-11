@@ -37,6 +37,6 @@
         </section>
     </div>
 
-    <script src="javascript/sign.js"></script>
+    <script src="../javascript/sign.js"></script>
 </body>
 </html>

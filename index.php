@@ -6,7 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Chat en ligne</title>
     <link rel="stylesheet" href="view/style.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"> -->
 </head>
-<?php
-require 'view/login.php';
+<body>
+    <?php
+    // Inclure le fichier login.php ici pour qu'il soit affiché dans le corps de la page.
+    require 'view/login.php'; 
+    ?>
+
+    
+    <script src="/javascript/login.js"></script>
+
+</body>
+</html>

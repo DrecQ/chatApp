@@ -1,64 +1,50 @@
-const  searchBar = document.querySelector(".users .search input"),
-searchBtn = document.querySelector(".users .search button"),
-userList = document.querySelector(".users .users-list");
+const searchBar = document.querySelector(".users .search input"),
+      searchBtn = document.querySelector(".users .search button"),
+      userList = document.querySelector(".users .users-list");
 
-
-searchBtn.onclick =()=>{
-    searchBar.classList.toggle("active");
-    searchBar.focus();
-    searchBtn.classList.toggle("active");
-    searchBar.value = "";
-}
-
-searchBar.onkeyup =()=>{
-    let searchTerm = searchBar.value;
-
-    if (searchTerm != "")
-        {
-            searchBar.classList.add("active");
-        }else{
-            searchBar.classList.remove("active");
-        }
-    
-    //Ajax 
+// Fonction pour envoyer une requête AJAX
+function sendRequest(url, method, data = null) {
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", "../controller/Search.php", true);
-    xhr.onload = ()=>{
-        if(xhr.readyState === XMLHttpRequest.DONE)
-        {
-            if(xhr.status === 200)
-            {
-                let data = xhr.response;
-                userList.innerHTML = data;
-
-            }
+    xhr.open(method, url, true);
+    
+    xhr.onload = () => {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            let response = xhr.response.trim();
+            userList.innerHTML = response;
         }
+    };
+    
+    if (data) {
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.send(data);
+    } else {
+        xhr.send();
     }
-  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-  xhr.send("searchTerm=" + searchTerm);
-
 }
- 
-//
-setInterval(() =>{
 
-    //Ajax 
-  let xhr = new XMLHttpRequest();
-  xhr.open("GET", "../controller/UserController.php", true);
-  xhr.onload = ()=>{
-      if(xhr.readyState === XMLHttpRequest.DONE)
-      {
-          if(xhr.status === 200)
-          {
-              let data = xhr.response;
-              if(!searchBar.classList.contains("active"))
-                {
-                    userList.innerHTML = data;
-                }
-          }
-      }
-  }
+// Gestion du clic sur le bouton de recherche
+searchBtn.addEventListener("click", () => {
+    searchBar.classList.toggle("active");
+    searchBtn.classList.toggle("active");
+    searchBar.focus();
+    searchBar.value = "";
+});
 
-  xhr.send();
+// Gestion de la saisie dans la barre de recherche
+searchBar.addEventListener("keyup", () => {
+    let searchTerm = searchBar.value.trim();
 
-}, 500); 
+    if (searchTerm !== "") {
+        searchBar.classList.add("active");
+        sendRequest("../controller/Search.php", "POST", `searchTerm=${searchTerm}`);
+    } else {
+        searchBar.classList.remove("active");
+    }
+});
+
+// Actualisation des utilisateurs toutes les 500ms (délai pour ne pas surcharger le serveur)
+setInterval(() => {
+    if (!searchBar.classList.contains("active")) {
+        sendRequest("../controller/UserController.php", "GET");
+    }
+}, 500);
